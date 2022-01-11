@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
 class RoundedIconTile extends StatelessWidget {
-  final Color color;
-  final Color primaryColor;
   final IconData icon;
   final void Function()? onTap;
-  const RoundedIconTile({Key? key, required this.color, required this.icon, this.onTap, required this.primaryColor}) : super(key: key);
+  const RoundedIconTile({Key? key, required this.icon, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: primaryColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(8.00)
       ),
       padding: const EdgeInsets.all(8.00),
@@ -19,12 +18,12 @@ class RoundedIconTile extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: color,
+            color: theme.backgroundColor,
           ),
           padding: const EdgeInsets.all(8.00),
           child: Icon(
             icon,
-            color: Colors.white,
+            color: theme.iconTheme.color,
             size: 25.00,
           ),
         ),

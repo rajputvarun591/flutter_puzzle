@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -9,6 +10,8 @@ import 'package:flutter_puzzle/controllers/time_controller.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
 import 'package:flutter_puzzle/styles/text_style.dart';
 import 'package:flutter_puzzle/styles/themes.dart';
+import 'package:flutter_puzzle/widgets/cupertino_color_selector.dart';
+import 'package:flutter_puzzle/widgets/material_color_selector.dart';
 import 'package:flutter_puzzle/widgets/my_grid_painter.dart';
 import 'package:flutter_puzzle/widgets/puzzle_card.dart';
 import 'package:flutter_puzzle/widgets/puzzle_draggable_tile.dart';
@@ -24,37 +27,37 @@ class PuzzleBoard extends StatefulWidget {
 }
 
 class _PuzzleBoardState extends State<PuzzleBoard> {
-  final Random random = Random();
+  // final Random random = Random();
 
   late int currentLevel;
 
-  Color get gradientColor1 => Color.fromRGBO(
-        random.nextInt(155) + 100,
-        random.nextInt(155) + 100,
-        random.nextInt(155) + 100,
-        0.5,
-      );
-  Color get gradientColor2 => Color.fromRGBO(
-        random.nextInt(155) + 100,
-        random.nextInt(155) + 100,
-        random.nextInt(155) + 100,
-        0.5,
-      );
-
-  Color get color => Color.fromRGBO(
-        Random().nextInt(200),
-        Random().nextInt(200),
-        Random().nextInt(200),
-        1.0,
-      );
-
-  Color? tileColor;
+  // Color get gradientColor1 => Color.fromRGBO(
+  //       random.nextInt(155) + 100,
+  //       random.nextInt(155) + 100,
+  //       random.nextInt(155) + 100,
+  //       0.5,
+  //     );
+  // Color get gradientColor2 => Color.fromRGBO(
+  //       random.nextInt(155) + 100,
+  //       random.nextInt(155) + 100,
+  //       random.nextInt(155) + 100,
+  //       0.5,
+  //     );
+  //
+  // Color get color => Color.fromRGBO(
+  //       Random().nextInt(200),
+  //       Random().nextInt(200),
+  //       Random().nextInt(200),
+  //       1.0,
+  //     );
+  //
+  // Color? tileColor;
 
   @override
   void initState() {
     super.initState();
     currentLevel = 1;
-    tileColor ??= color;
+    //tileColor ??= color;
   }
 
   @override
@@ -92,11 +95,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
               padding: const EdgeInsets.symmetric(horizontal: 8.00),
               child: Row(
                 children: [
-                  RoundedIconTile(
-                    primaryColor: theme.cardColor,
-                    color: tileColor!,
-                    icon: Icons.timer_rounded,
-                  ),
+                  const RoundedIconTile(icon: Icons.timer_rounded),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     child: Text(
@@ -126,11 +125,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
               padding: const EdgeInsets.symmetric(horizontal: 8.00),
               child: Row(
                 children: [
-                  RoundedIconTile(
-                    primaryColor: theme.cardColor,
-                    color: tileColor!,
-                    icon: Icons.grid_3x3,
-                  ),
+                  const RoundedIconTile(icon: Icons.grid_3x3),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     child: Text(
@@ -187,7 +182,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                     borderRadius: BorderRadius.circular(8.00),
                   ),
                   child: CustomPaint(
-                    painter: MyGridPainter(tileColor!.withOpacity(0.7)),
+                    painter: MyGridPainter(theme.backgroundColor.withOpacity(0.7)),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.transparent,
@@ -206,7 +201,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                         child: puzzleController.isGameCompleted
                             ? Container(
                                 decoration: BoxDecoration(
-                                  color: tileColor!,
+                                  color: theme.backgroundColor,
                                 ),
                                 width: double.infinity,
                                 child: Column(
@@ -225,7 +220,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                                     ElevatedButton(
                                       onPressed: _onNextTap,
                                       style: ElevatedButton.styleFrom(
-                                        primary: tileColor!,
+                                        primary: theme.backgroundColor,
                                         shape: CircleBorder(side: BorderSide(color: Colors.white, width: 2.00)),
                                       ),
                                       child: const Icon(
@@ -249,7 +244,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                                     child: PuzzleCard(
                                       puzzle: puzzleCards[index],
                                       endCardValue: puzzleController.endingCardValue,
-                                      color: tileColor!,
+                                      color: theme.backgroundColor,
                                     ),
                                   );
                                 }),
@@ -268,16 +263,12 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   RoundedIconTile(
-                    primaryColor: theme.cardColor,
-                    color: tileColor!,
                     icon: Icons.history,
                     onTap: _onResetTap,
                   ),
                   Consumer<ThemeController>(builder: (context, themeC, child) {
                     return RoundedIconTile(
-                      primaryColor: theme.cardColor,
-                      color: tileColor!,
-                      icon: themeC.isDarkEnabled ? Icons.wb_sunny : Icons.dark_mode,
+                      icon: Icons.color_lens,
                       onTap: () => _onThemeChange(themeC.isDarkEnabled),
                     );
                   }),
@@ -338,8 +329,17 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
     Provider.of<PuzzleController>(context, listen: false).initCards(level: currentLevel);
   }
 
-  void _onThemeChange(bool isDarkEnabled) {
-    ThemeData themeData = isDarkEnabled ? normalTheme : darkTheme;
-    Provider.of<ThemeController>(context, listen: false).changeTheme(themeData);
+  void _onThemeChange(bool isDarkEnabled) async {
+    final result = await showDialog(
+      context: context,
+      builder: (context) {
+        if(!Platform.isIOS) {
+          return const CupertinoColorSelector();
+        } else {
+          return const MaterialColorSelector();
+        }
+      },
+    );
+    Provider.of<ThemeController>(context, listen: false).changeTheme(result);
   }
 }

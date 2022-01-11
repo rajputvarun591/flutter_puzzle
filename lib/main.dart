@@ -25,14 +25,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-
-  Color get color => Color.fromRGBO(
-    Random().nextInt(200),
-    Random().nextInt(200),
-    Random().nextInt(200),
-    1.0,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeController>(

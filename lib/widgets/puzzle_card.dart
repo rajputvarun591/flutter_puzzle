@@ -10,6 +10,7 @@ class PuzzleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     final Size size = MediaQuery.of(context).size;
     final bool isHolder = puzzle.cardValue == endCardValue;
     return Container(
@@ -23,7 +24,7 @@ class PuzzleCard extends StatelessWidget {
         visible: !isHolder,
         child: Text(
           "${puzzle.cardValue}",
-          style: ts20ptPoiretOneSEMIBOLD.copyWith(fontSize: 50.00, color: Colors.white),
+          style: ts20ptPoiretOneSEMIBOLD.copyWith(fontSize: 50.00, color: theme.textTheme.headline3!.color),
         ),
       ),
     );
