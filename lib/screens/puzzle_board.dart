@@ -333,7 +333,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
     final result = await showDialog(
       context: context,
       builder: (context) {
-        if(!Platform.isIOS) {
+        if(Platform.isIOS) {
           return const CupertinoColorSelector();
         } else {
           return const MaterialColorSelector();

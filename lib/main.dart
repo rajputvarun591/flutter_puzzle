@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/drag_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
@@ -12,6 +13,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<AnimationStatusController>(create: (context) => AnimationStatusController()),
         ChangeNotifierProvider<ThemeController>(create: (context) => ThemeController()),
         ChangeNotifierProvider<DragController>(create: (context) => DragController()),
         ChangeNotifierProvider<TimeController>(create: (context) => TimeController()),

@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
 import 'dart:math';
@@ -35,8 +36,6 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
 
   late bool isHorizontal;
 
-  bool isFired = false;
-
   @override
   void initState() {
     super.initState();
@@ -60,19 +59,23 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
     double maxVerticalBound = max(widget.currentChildAlignment.y, widget.destinationChildAlignment.y);
     double minHorizontalBound = min(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
     double maxHorizontalBound = max(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
-    return GestureDetector(
-      onPanDown: (details) => _onPanDown(details, isHolder, size),
-      // onVerticalDragUpdate:
-      //     isHorizontal ? null : (details) => _onVerticalDragUpdate(details, size, isHolder, minVerticalBound, maxVerticalBound),
-      // onHorizontalDragUpdate:
-      //     !isHorizontal ? null : (details) => _onHorizontalDragUpdate(details, size, isHolder, minHorizontalBound, maxHorizontalBound),
-      // onHorizontalDragEnd:
-      //     !isHorizontal ? null : (details) => _onHorizontalDragEnd(details, minHorizontalBound, maxHorizontalBound, size, isHolder),
-      // onVerticalDragEnd: isHorizontal ? null : (details) => _onVerticalDragEnd(details, minVerticalBound, maxVerticalBound, size, isHolder),
-      child: Align(
-        alignment: _dragAlignment,
-        child: widget.child,
-      ),
+    return Consumer<AnimationStatusController>(
+      builder: (context, controller, child) {
+        return GestureDetector(
+          onPanDown: (details) => _onPanDown(details, isHolder, size, controller.isSomeoneAnimating),
+          // onVerticalDragUpdate:
+          //     isHorizontal ? null : (details) => _onVerticalDragUpdate(details, size, isHolder, minVerticalBound, maxVerticalBound),
+          // onHorizontalDragUpdate:
+          //     !isHorizontal ? null : (details) => _onHorizontalDragUpdate(details, size, isHolder, minHorizontalBound, maxHorizontalBound),
+          // onHorizontalDragEnd:
+          //     !isHorizontal ? null : (details) => _onHorizontalDragEnd(details, minHorizontalBound, maxHorizontalBound, size, isHolder),
+          // onVerticalDragEnd: isHorizontal ? null : (details) => _onVerticalDragEnd(details, minVerticalBound, maxVerticalBound, size, isHolder),
+          child: Align(
+            alignment: _dragAlignment,
+            child: widget.child,
+          ),
+        );
+      }
     );
   }
 
@@ -121,10 +124,9 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
         destAlign = widget.currentChildAlignment;
       } else {
         destAlign = widget.destinationChildAlignment;
-        isFired = true;
       }
       _animation = _controller.drive(AlignmentTween(begin: _dragAlignment, end: destAlign));
-      _animate(details.velocity.pixelsPerSecond, size, isFired);
+      _animate(details.velocity.pixelsPerSecond, size);
     }
   }
 
@@ -137,10 +139,9 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
         destAlign = widget.currentChildAlignment;
       } else {
         destAlign = widget.destinationChildAlignment;
-        isFired = true;
       }
       _animation = _controller.drive(AlignmentTween(begin: _dragAlignment, end: destAlign));
-      _animate(details.velocity.pixelsPerSecond, size, isFired);
+      _animate(details.velocity.pixelsPerSecond, size);
     }
   }
 
@@ -168,40 +169,37 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
     }
   }
 
-  void _animate(Offset pixelsPerSecond, size, bool isFired) {
+  void _animate(Offset pixelsPerSecond, size) {
     final unitsPerSecondX = pixelsPerSecond.dx / size.width;
     final unitsPerSecondY = pixelsPerSecond.dy / size.height;
     final unitsPerSecond = Offset(unitsPerSecondX, unitsPerSecondY);
     final unitVelocity = unitsPerSecond.distance;
 
     const spring = SpringDescription(
-      mass: 30,
+      mass: 100,
       stiffness: 1,
       damping: 1,
     );
     final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
-    _controller.animateWith(simulation);
-    if (isFired) {
-      developer.log("Fired");
+    _controller.animateWith(simulation).then((value) {
       _dragAlignment = widget.currentChildAlignment;
-      _controller.stop();
       Provider.of<PuzzleController>(context, listen: false).swapChildren(widget.currentChild);
-    }
-
+    });
   }
 
   void _listener() {
     setState(() {
       _dragAlignment = _animation!.value;
+      Provider.of<AnimationStatusController>(context, listen: false).updateStatus(_controller.isAnimating);
     });
   }
 
-  void _onPanDown(DragDownDetails details, bool isHolder, Size size) {
+  void _onPanDown(DragDownDetails details, bool isHolder, Size size, bool isSomeoneAnimating) {
     developer.log("_onPanDown " + widget.currentChild.cardValue.toString());
+    if(isSomeoneAnimating) return;
     if (!isHolder && widget.isActiveChild) {
-      isFired = true;
       _animation = _controller.drive(AlignmentTween(begin: _dragAlignment, end: widget.destinationChildAlignment));
-      _animate(details.globalPosition, size, isFired);
+      _animate(details.globalPosition, size);
     }
   }
 }
