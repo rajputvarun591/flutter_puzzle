@@ -8,7 +8,11 @@ class ScoreCardController extends ChangeNotifier {
 
   void getScore(int level) {
     scoreCard = database.getScore(level);
-    //notifyListeners();
+    notifyListeners();
+  }
+
+  void getInitialScore(int level) {
+    scoreCard = database.getScore(level);
   }
 
   void saveScore(ScoreCard score, int level) async {

@@ -22,12 +22,17 @@ class PuzzleController extends ChangeNotifier {
 
   int moves = 0;
   int level = 1;
+  int gridNumber = 3;
   bool isGameCompleted = false;
 
-  void initCards({int? gridNumber}) {
+  void initCards({int? grid}) {
     puzzles.clear();
     moves = 0;
-    gridNumber ??= 3;
+
+    if(grid != null) {
+      gridNumber = grid;
+    }
+
     int totalNumbers = gridNumber * gridNumber;
 
     List<int> values = getValues(level, totalNumbers);
@@ -39,7 +44,7 @@ class PuzzleController extends ChangeNotifier {
     isGameCompleted = false;
     notifyListeners();
     timeController.initValues();
-    getScore();
+    scoreController.getInitialScore(level);
   }
 
   void swapChildren(Puzzle puzzle) {
@@ -58,7 +63,7 @@ class PuzzleController extends ChangeNotifier {
     List<int> numbers = [];
     level ??= 1;
 
-    int ending = total * level; // 27
+    int ending = total * level;
     endingCardValue = ending;
 
     for (int i = 0; i < total; i++) {
@@ -99,17 +104,24 @@ class PuzzleController extends ChangeNotifier {
     }
   }
 
-  void shuffleCards() {
-    initCards();
-  }
-
   void increaseLevel() {
     level++;
+    getScore();
     puzzles.clear();
     initCards();
   }
 
   void getScore() {
     scoreController.getScore(level);
+  }
+
+  void swapTwoChildren(Puzzle first, Puzzle last) {
+    final lastIndex = puzzles.indexWhere((element) => element.cardValue == last.cardValue);
+    final childIndex = puzzles.indexWhere((element) => element.cardValue == first.cardValue);
+
+    puzzles[childIndex] = Puzzle(last.cardValue);
+    puzzles[lastIndex] = Puzzle(first.cardValue);
+
+    notifyListeners();
   }
 }

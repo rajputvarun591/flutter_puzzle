@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter_puzzle/constants/constants.dart';
 import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
@@ -15,6 +16,8 @@ class PuzzleDraggableTile extends StatefulWidget {
   final bool isActiveChild;
   final Alignment currentChildAlignment;
   final Alignment destinationChildAlignment;
+  final int index;
+  final int endingCardValue;
 
   const PuzzleDraggableTile({
     Key? key,
@@ -23,6 +26,8 @@ class PuzzleDraggableTile extends StatefulWidget {
     required this.isActiveChild,
     required this.currentChildAlignment,
     required this.destinationChildAlignment,
+    required this.index,
+    required this.endingCardValue,
   }) : super(key: key);
 
   @override
@@ -36,12 +41,16 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
 
   late bool isHorizontal;
 
+  Alignment oldAlign = const Alignment(0.0, 0.0);
+
   @override
   void initState() {
     super.initState();
-    _dragAlignment = widget.currentChildAlignment;
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 50));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
     _controller.addListener(_listener);
+    _animation = _controller.drive(AlignmentTween(begin: oldAlign, end: widget.currentChildAlignment));
+    _controller.forward();
+    oldAlign = _dragAlignment = widget.currentChildAlignment;
   }
 
   @override
@@ -54,29 +63,27 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
   Widget build(BuildContext context) {
     isHorizontal = widget.currentChildAlignment.y == widget.destinationChildAlignment.y;
     final size = MediaQuery.of(context).size;
-    bool isHolder = widget.currentChild.cardValue == 15;
-    double minVerticalBound = min(widget.currentChildAlignment.y, widget.destinationChildAlignment.y);
-    double maxVerticalBound = max(widget.currentChildAlignment.y, widget.destinationChildAlignment.y);
-    double minHorizontalBound = min(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
-    double maxHorizontalBound = max(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
-    return Consumer<AnimationStatusController>(
-      builder: (context, controller, child) {
-        return GestureDetector(
-          onPanDown: (details) => _onPanDown(details, isHolder, size, controller.isSomeoneAnimating),
-          // onVerticalDragUpdate:
-          //     isHorizontal ? null : (details) => _onVerticalDragUpdate(details, size, isHolder, minVerticalBound, maxVerticalBound),
-          // onHorizontalDragUpdate:
-          //     !isHorizontal ? null : (details) => _onHorizontalDragUpdate(details, size, isHolder, minHorizontalBound, maxHorizontalBound),
-          // onHorizontalDragEnd:
-          //     !isHorizontal ? null : (details) => _onHorizontalDragEnd(details, minHorizontalBound, maxHorizontalBound, size, isHolder),
-          // onVerticalDragEnd: isHorizontal ? null : (details) => _onVerticalDragEnd(details, minVerticalBound, maxVerticalBound, size, isHolder),
-          child: Align(
-            alignment: _dragAlignment,
-            child: widget.child,
-          ),
-        );
-      }
-    );
+    bool isHolder = widget.currentChild.cardValue == widget.endingCardValue;
+    //double minVerticalBound = min(widget.currentChildAlignment.y, widget.destinationChildAlignment.y);
+    //double maxVerticalBound = max(widget.currentChildAlignment.y, widget.destinationChildAlignment.y);
+    //double minHorizontalBound = min(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
+    //double maxHorizontalBound = max(widget.currentChildAlignment.x, widget.destinationChildAlignment.x);
+    return Consumer<AnimationStatusController>(builder: (context, controller, child) {
+      return GestureDetector(
+        onPanDown: (details) => _onPanDown(details, isHolder, size, controller.isSomeoneAnimating),
+        // onVerticalDragUpdate:
+        //     isHorizontal ? null : (details) => _onVerticalDragUpdate(details, size, isHolder, minVerticalBound, maxVerticalBound),
+        // onHorizontalDragUpdate:
+        //     !isHorizontal ? null : (details) => _onHorizontalDragUpdate(details, size, isHolder, minHorizontalBound, maxHorizontalBound),
+        // onHorizontalDragEnd:
+        //     !isHorizontal ? null : (details) => _onHorizontalDragEnd(details, minHorizontalBound, maxHorizontalBound, size, isHolder),
+        // onVerticalDragEnd: isHorizontal ? null : (details) => _onVerticalDragEnd(details, minVerticalBound, maxVerticalBound, size, isHolder),
+        child: Align(
+          alignment: _dragAlignment,
+          child: widget.child,
+        ),
+      );
+    });
   }
 
   void _onVerticalDragUpdate(DragUpdateDetails details, Size size, bool isHolder, double min, double max) {
@@ -196,7 +203,7 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
 
   void _onPanDown(DragDownDetails details, bool isHolder, Size size, bool isSomeoneAnimating) {
     developer.log("_onPanDown " + widget.currentChild.cardValue.toString());
-    if(isSomeoneAnimating) return;
+    if (isSomeoneAnimating) return;
     if (!isHolder && widget.isActiveChild) {
       _animation = _controller.drive(AlignmentTween(begin: _dragAlignment, end: widget.destinationChildAlignment));
       _animate(details.globalPosition, size);

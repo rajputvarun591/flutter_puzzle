@@ -31,6 +31,7 @@ void main() async {
             Provider.of<ScoreCardController>(context, listen: false),
           )..initCards(),
         ),
+
       ],
       child: const MyApp(),
     ),

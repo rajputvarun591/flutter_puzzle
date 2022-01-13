@@ -157,7 +157,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
 
             Consumer<ScoreCardController>(builder: (context, controller, child) {
               return Visibility(
-                visible: controller.scoreCard != null && controller.scoreCard!.moves != null,
+                visible: controller.scoreCard != null,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8.00),
                   child: Row(
@@ -165,13 +165,22 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                       const RoundedIconTile(icon: Icons.wine_bar),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text("Best Score", style: ts20ptPacificoMEDIUM),
+                        child: Text(
+                          "Best Score",
+                          style: ts20ptPacificoMEDIUM.copyWith(
+                            fontSize: 18.00,
+                            color: theme.textTheme.headline2!.color,
+                          ),
+                        ),
                       ),
                       Expanded(child: Container()),
                       Consumer<TimeController>(builder: (context, timerController, child) {
                         return Text(
                           "${controller.scoreCard?.duration.toString()} in ${controller.scoreCard?.moves.toString()}",
-                          style: ts20ptPoiretOneBOLD.copyWith(letterSpacing: 5.00),
+                          style: ts20ptPoiretOneBOLD.copyWith(
+                            fontSize: 18.00,
+                            color: theme.textTheme.subtitle1!.color,
+                          ),
                         );
                       }),
                     ],
@@ -185,6 +194,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                 var puzzleCards = puzzleController.puzzles;
                 var activeCards = _getActiveChild(puzzleCards, puzzleController.endingCardValue);
                 var destinationChildIndex = puzzleCards.indexWhere((element) => element.cardValue == puzzleController.endingCardValue);
+                print("V " + puzzleCards.toString());
                 return Container(
                   decoration: BoxDecoration(
                     color: theme.cardColor,
@@ -247,6 +257,8 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                                     isActiveChild: isActiveChild,
                                     currentChildAlignment: d3Aligns[index],
                                     destinationChildAlignment: d3Aligns[destinationChildIndex],
+                                    index: index,
+                                    endingCardValue: puzzleController.endingCardValue,
                                     child: PuzzleCard(
                                       puzzle: puzzleCards[index],
                                       endCardValue: puzzleController.endingCardValue,
@@ -327,7 +339,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
   }
 
   void _onResetTap() {
-    Provider.of<PuzzleController>(context, listen: false).shuffleCards();
+    Provider.of<PuzzleController>(context, listen: false).initCards();
   }
 
   void _onNextTap() {
