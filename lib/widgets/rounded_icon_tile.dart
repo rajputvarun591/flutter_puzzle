@@ -11,7 +11,7 @@ class RoundedIconTile extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(8.00)
+        borderRadius: BorderRadius.circular(6.00)
       ),
       padding: const EdgeInsets.all(8.00),
       child: InkWell(
@@ -20,7 +20,7 @@ class RoundedIconTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.backgroundColor,
           ),
-          padding: const EdgeInsets.all(8.00),
+          padding: const EdgeInsets.all(5.00),
           child: Icon(
             icon,
             color: theme.iconTheme.color,

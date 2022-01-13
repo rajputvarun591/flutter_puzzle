@@ -1,23 +1,36 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/drag_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
+import 'package:flutter_puzzle/database/hive_database.dart';
 import 'package:flutter_puzzle/screens/puzzle_board.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'controllers/score_card_controller.dart';
+
+void main() async {
+  await Hive.initFlutter();
+  await HiveDatabase.initDatabase();
+  await Hive.openBox(HiveDatabase.scoreCardBox);
+
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<ScoreCardController>(create: (context) => ScoreCardController()),
         ChangeNotifierProvider<AnimationStatusController>(create: (context) => AnimationStatusController()),
         ChangeNotifierProvider<ThemeController>(create: (context) => ThemeController()),
         ChangeNotifierProvider<DragController>(create: (context) => DragController()),
         ChangeNotifierProvider<TimeController>(create: (context) => TimeController()),
-        ChangeNotifierProvider<PuzzleController>(create: (context) => PuzzleController(Provider.of<TimeController>(context, listen: false))..initCards()),
+        ChangeNotifierProvider<PuzzleController>(
+          create: (context) => PuzzleController(
+            Provider.of<TimeController>(context, listen: false),
+            Provider.of<ScoreCardController>(context, listen: false),
+          )..initCards(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -29,14 +42,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeController>(
-      builder: (context, themeController, child) {
-        return MaterialApp(
-          title: 'Flutter Demo',
-          theme: themeController.theme,
-          home: const PuzzleBoard(),
-        );
-      }
-    );
+    return Consumer<ThemeController>(builder: (context, themeController, child) {
+      return MaterialApp(
+        title: 'Flutter Demo',
+        theme: themeController.theme,
+        home: const PuzzleBoard(),
+      );
+    });
   }
 }

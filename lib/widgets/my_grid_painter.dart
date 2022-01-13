@@ -13,17 +13,17 @@ class MyGridPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 2.00;
-    Offset offsetTTB1 = Offset(size.width * 0.34, lineGap);
-    Offset offsetTTB1E = Offset(size.width * 0.34, size.height - lineGap);
+    Offset offsetTTB1 = Offset(size.width / 3, lineGap);
+    Offset offsetTTB1E = Offset(size.width / 3, size.height - lineGap);
 
-    Offset offsetTTB2 = Offset(size.width * 0.66, lineGap);
-    Offset offsetTTB2E = Offset(size.width * 0.66, size.height - lineGap);
+    Offset offsetTTB2 = Offset(size.width / 1.5, lineGap);
+    Offset offsetTTB2E = Offset(size.width / 1.5, size.height - lineGap);
 
-    Offset offsetLTR1 = Offset(lineGap, size.height * 0.34);
-    Offset offsetLTR1E = Offset(size.width - lineGap, size.height * 0.34);
+    Offset offsetLTR1 = Offset(lineGap, size.height / 3);
+    Offset offsetLTR1E = Offset(size.width - lineGap, size.height / 3);
 
-    Offset offsetLTR2 = Offset(lineGap, size.height * 0.66);
-    Offset offsetLTR2E = Offset(size.width - lineGap, size.height * 0.66);
+    Offset offsetLTR2 = Offset(lineGap, size.height / 1.5);
+    Offset offsetLTR2E = Offset(size.width - lineGap, size.height / 1.5);
 
     Path path1 = Path()
       ..moveTo(offsetTTB1.dx, offsetTTB1.dy)
