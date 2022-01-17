@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class RoundedIconTile extends StatelessWidget {
   final IconData icon;
   final void Function()? onTap;
-  const RoundedIconTile({Key? key, required this.icon, this.onTap}) : super(key: key);
+  final Function(DragDownDetails details)? onPanDown;
+  final Function(DragEndDetails details)? onPanEnd;
+  const RoundedIconTile({Key? key, required this.icon, this.onTap, this.onPanDown, this.onPanEnd}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +16,10 @@ class RoundedIconTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(6.00)
       ),
       padding: const EdgeInsets.all(8.00),
-      child: InkWell(
+      child: GestureDetector(
         onTap: onTap,
+        onPanDown: onPanDown,
+        onPanEnd: onPanEnd,
         child: Container(
           decoration: BoxDecoration(
             color: theme.backgroundColor,

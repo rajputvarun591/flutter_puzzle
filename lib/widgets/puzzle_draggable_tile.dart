@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_puzzle/constants/constants.dart';
 import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
+import 'package:flutter_puzzle/controllers/hint_controller.dart';
+import 'package:flutter_puzzle/controllers/order_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
 import 'dart:math';
@@ -46,11 +48,46 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
     _controller.addListener(_listener);
     _animation = _controller.drive(AlignmentTween(begin: oldAlign, end: widget.currentChildAlignment));
     _controller.forward();
     oldAlign = _dragAlignment = widget.currentChildAlignment;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Provider.of<HintController>(context, listen: true).addListener(() {
+      var pro = context.read<HintController>();
+      Puzzle puzzle = pro.puzzle!;
+      if(puzzle.cardValue == widget.currentChild.cardValue) {
+        _controller.reset();
+        _animation = _controller.drive(AlignmentTween(begin: widget.currentChildAlignment, end: widget.destinationChildAlignment));
+        _controller.forward().then((value) {
+          _dragAlignment = widget.currentChildAlignment;
+          Provider.of<PuzzleController>(context, listen: false).swapChildren(widget.currentChild);
+        });
+      }
+    });
+
+    Provider.of<OrderController>(context, listen: true).addListener(() {
+      if (mounted) {
+        var pro = context.read<OrderController>();
+        var puzzlePro = context.read<PuzzleController>();
+        bool isOrdering = pro.isOrdering;
+        
+        if(isOrdering) {
+          int firstCardValue = puzzlePro.endingCardValue - 8;
+          Alignment dest = d3Aligns[widget.currentChild.cardValue - firstCardValue];
+          _controller.reset();
+          _animation = _controller.drive(AlignmentTween(begin: widget.currentChildAlignment, end: dest));
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
+      }
+    });
   }
 
   @override

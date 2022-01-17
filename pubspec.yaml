@@ -34,6 +34,7 @@ dependencies:
   hive:
   hive_flutter:
   path_provider: ^2.0.8
+  soundpool: ^2.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

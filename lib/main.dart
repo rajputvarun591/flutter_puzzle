@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/drag_controller.dart';
+import 'package:flutter_puzzle/controllers/hint_controller.dart';
+import 'package:flutter_puzzle/controllers/order_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
@@ -20,6 +22,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<OrderController>(create: (context) => OrderController()),
+        ChangeNotifierProvider<HintController>(create: (context) => HintController()),
         ChangeNotifierProvider<ScoreCardController>(create: (context) => ScoreCardController()),
         ChangeNotifierProvider<AnimationStatusController>(create: (context) => AnimationStatusController()),
         ChangeNotifierProvider<ThemeController>(create: (context) => ThemeController()),

@@ -4,6 +4,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_puzzle/constants/constants.dart';
+import 'package:flutter_puzzle/controllers/hint_controller.dart';
+import 'package:flutter_puzzle/controllers/order_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/score_card_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
@@ -192,9 +194,8 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
             SafeArea(
               child: Consumer<PuzzleController>(builder: (context, puzzleController, child) {
                 var puzzleCards = puzzleController.puzzles;
-                var activeCards = _getActiveChild(puzzleCards, puzzleController.endingCardValue);
                 var destinationChildIndex = puzzleCards.indexWhere((element) => element.cardValue == puzzleController.endingCardValue);
-                print("V " + puzzleCards.toString());
+                var activeCards = _getActiveChild(puzzleCards, destinationChildIndex);
                 return Container(
                   decoration: BoxDecoration(
                     color: theme.cardColor,
@@ -284,6 +285,15 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                     icon: Icons.shuffle,
                     onTap: _onResetTap,
                   ),
+                  RoundedIconTile(
+                    icon: Icons.lightbulb_outline,
+                    onTap: () {},
+                  ),
+                  RoundedIconTile(
+                    icon: Icons.check,
+                    onPanDown: _onCheckDown,
+                    onPanEnd: _onCheckEnd,
+                  ),
                   Consumer<ThemeController>(builder: (context, themeC, child) {
                     return RoundedIconTile(
                       icon: Icons.color_lens,
@@ -299,9 +309,8 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
     );
   }
 
-  List<Puzzle> _getActiveChild(List<Puzzle> puzzleCards, int endingCardValue) {
+  List<Puzzle> _getActiveChild(List<Puzzle> puzzleCards, int holderIndex) {
     List<Puzzle> activeCards = [];
-    final holderIndex = puzzleCards.indexWhere((element) => element.cardValue == endingCardValue);
 
     bool isInLeft = holderIndex == 0 || holderIndex == 3 || holderIndex == 6 || holderIndex == 9;
     bool isInMiddle = holderIndex == 1 || holderIndex == 4 || holderIndex == 7 || holderIndex == 10;
@@ -358,5 +367,61 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
       },
     );
     Provider.of<ThemeController>(context, listen: false).changeTheme(result);
+  }
+
+  // void _onHintTap() {
+  //   var pro = Provider.of<PuzzleController>(context, listen: false);
+  //   var puzzles = pro.puzzles;
+  //   Puzzle walkablePuzzle;
+  //   int currentHolderPosition = puzzles.indexWhere((element) => element.cardValue == pro.endingCardValue);
+  //   List<Puzzle> activeCards = _getActiveChild(puzzles, currentHolderPosition);
+  //
+  //   var current1stCard = puzzles[0];
+  //   var current2ndCard = puzzles[1];
+  //   var current3rdCard = puzzles[2];
+  //
+  //   int current1stValue = pro.endingCardValue - 8;
+  //   int current2ndValue = pro.endingCardValue - 7;
+  //   int current3rdValue = pro.endingCardValue - 6;
+  //
+  //
+  //
+  //   if(current1stCard.cardValue == current1stValue
+  //       && current2ndCard.cardValue == current2ndValue
+  //       && current3rdCard.cardValue == current3rdValue) {
+  //
+  //   } else {
+  //     if(current2ndCard.cardValue == current2ndValue) {
+  //
+  //     } else {
+  //       if(activeCards.any((element) => element.cardValue == current2ndValue) && currentHolderPosition == 2) {
+  //         walkablePuzzle = activeCards.where((element) => element.cardValue == current2ndValue).first;
+  //       } else {
+  //         int indexOf2ndCard = puzzles.indexWhere((element) => element.cardValue == current2ndValue);
+  //         int indexToBeCleared = getIndexToBeClearedForPosition2(indexOf2ndCard, currentHolderPosition);
+  //       }
+  //     }
+  //   }
+  //   Provider.of<HintController>(context, listen: false).performHint(walkablePuzzle);
+  // }
+
+  // int getIndexToBeClearedForPosition2(int index, int currentHolderIndex) {
+  //   switch(index) {
+  //     case 0 : return 1;
+  //     case 1 : return 2;
+  //     case 3 : return 0;
+  //     case 4 : return currentHolderIndex > 2 ? 1 : 5;
+  //     case 5 : return 2;
+  //     case 6 : return currentHolderIndex > 34 ?
+  //   }
+  // }
+
+
+  void _onCheckDown(DragDownDetails details) {
+    Provider.of<OrderController>(context, listen: false).showOrder(true);
+  }
+
+  void _onCheckEnd(DragEndDetails details) {
+    Provider.of<OrderController>(context, listen: false).showOrder(false);
   }
 }
