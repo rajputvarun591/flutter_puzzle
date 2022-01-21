@@ -18,6 +18,7 @@ void main() async {
   await Hive.initFlutter();
   await HiveDatabase.initDatabase();
   await Hive.openBox(HiveDatabase.scoreCardBox);
+  await Hive.openBox(HiveDatabase.parentPuzzleBox);
 
   runApp(
     MultiProvider(

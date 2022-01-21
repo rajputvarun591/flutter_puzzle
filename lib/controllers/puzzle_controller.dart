@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_puzzle/controllers/score_card_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
+import 'package:flutter_puzzle/database/hive_database.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
 
 import 'dart:developer' as developer;
@@ -45,6 +46,7 @@ class PuzzleController extends ChangeNotifier {
     notifyListeners();
     timeController.initValues();
     scoreController.getInitialScore(level);
+    HiveDatabase().clearParentPuzzle();
   }
 
   void swapChildren(Puzzle puzzle) {

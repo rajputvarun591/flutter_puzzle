@@ -1,6 +1,14 @@
-class NodePath {
-  final int pathCost;
-  final int pathEstimate;
+import 'package:flutter_puzzle/models/puzzle.dart';
 
-  NodePath(this.pathCost, this.pathEstimate);
+class NodePath {
+  final int goalToDestinationCost;
+  final int holderToDestinationCost;
+  final List<Puzzle> respectivePuzzle;
+
+  NodePath(this.goalToDestinationCost, this.holderToDestinationCost, this.respectivePuzzle);
+
+  @override
+  String toString() {
+    return 'NodePath{goalToDestinationCost: $goalToDestinationCost, holderToDestinationCost: $holderToDestinationCost, respectivePuzzle: $respectivePuzzle}';
+  }
 }

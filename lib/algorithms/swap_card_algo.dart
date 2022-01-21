@@ -1,21 +1,13 @@
 import 'package:flutter_puzzle/models/puzzle.dart';
 
 class SwapCardAlgo {
-  final Puzzle activeCard;
-  final Puzzle holderCard;
-  final List<Puzzle> cards;
-
-  SwapCardAlgo(this.activeCard, this.cards, this.holderCard);
-
-  List<Puzzle> get swappedListFor9 {
-    List<Puzzle> list = cards;
-
-    final activeCardIndex = cards.indexWhere((element) => element.cardValue == activeCard.cardValue);
-    final holderCardIndex = cards.indexWhere((element) => element.cardValue == activeCard.cardValue);
-
+  static List<Puzzle> swappedListFor9(Puzzle activeCard, Puzzle holderCard, final List<Puzzle> currentCards) {
+    List<Puzzle> list = [];
+    list.addAll(currentCards);
+    final activeCardIndex = currentCards.indexWhere((element) => element.cardValue == activeCard.cardValue);
+    final holderCardIndex = currentCards.indexWhere((element) => element.cardValue == holderCard.cardValue);
     list[activeCardIndex] = Puzzle(holderCard.cardValue);
     list[holderCardIndex] = Puzzle(activeCard.cardValue);
-
     return list;
   }
 }

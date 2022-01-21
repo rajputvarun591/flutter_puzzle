@@ -1,20 +1,16 @@
+import 'package:hive/hive.dart';
 
+part 'puzzle.g.dart';
+
+@HiveType(typeId: 102)
 class Puzzle {
+  @HiveField(0)
   final int cardValue;
-  //final Alignment alignment;
 
-  //Puzzle(this.cardValue, this.alignment);
   Puzzle(this.cardValue);
 
   @override
   String toString() {
-    return 'Puzzle{cardValue: $cardValue}' '\n';
+    return '$cardValue';
   }
-
-  // Puzzle copyWith({int? cardValue, Alignment? alignment}) {
-  //   return Puzzle(
-  //     cardValue = cardValue ?? this.cardValue,
-  //     alignment = alignment ?? this.alignment,
-  //   );
-  // }
 }

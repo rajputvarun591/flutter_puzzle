@@ -289,7 +289,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
                   ),
                   RoundedIconTile(
                     icon: Icons.lightbulb_outline,
-                    onTap: () {},
+                    onTap: _onHintTap,
                   ),
                   RoundedIconTile(
                     icon: Icons.check,
@@ -373,14 +373,12 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
 
   void _onHintTap() {
     var pro = Provider.of<PuzzleController>(context, listen: false);
-    Puzzle walkablePuzzle = AStarAlgo(pro.puzzles, pro.endingCardValue, ).getWalkablePuzzle();
+    Puzzle? walkablePuzzle = AStarAlgo.getWalkablePuzzle(pro.puzzles, pro.endingCardValue);
 
-
-    Provider.of<HintController>(context, listen: false).performHint(walkablePuzzle);
+    if (walkablePuzzle != null) {
+      Provider.of<HintController>(context, listen: false).performHint(walkablePuzzle);
+    }
   }
-
-
-
 
   void _onCheckDown(DragDownDetails details) {
     Provider.of<OrderController>(context, listen: false).showOrder(true);
@@ -389,6 +387,4 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
   void _onCheckEnd(DragEndDetails details) {
     Provider.of<OrderController>(context, listen: false).showOrder(false);
   }
-
-
 }
