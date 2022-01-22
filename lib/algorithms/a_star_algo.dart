@@ -41,8 +41,6 @@ class AStarAlgo {
         ///we are using hive to save the parent Puzzle
         List<Puzzle> parentPuzzle = HiveDatabase().getParentPuzzle();
 
-        print("Saved Parent " + parentPuzzle.toString());
-
         for (Puzzle item in activeCards) {
           final List<Puzzle> swappedList = SwapCardAlgo.swappedListFor9(item, cards[holderCardIndex], cards);
           NodePath path = PathFindAlgo.pathFor9(swappedList, goalValue, endingCardValue, i);

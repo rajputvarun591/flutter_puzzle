@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_puzzle/algorithms/a_star_algo.dart';
+import 'package:flutter_puzzle/algorithms/active_child_algo.dart';
 import 'package:flutter_puzzle/constants/constants.dart';
 import 'package:flutter_puzzle/controllers/hint_controller.dart';
 import 'package:flutter_puzzle/controllers/order_controller.dart';
@@ -17,9 +18,13 @@ import 'package:flutter_puzzle/models/puzzle.dart';
 import 'package:flutter_puzzle/models/score_card.dart';
 import 'package:flutter_puzzle/styles/text_style.dart';
 import 'package:flutter_puzzle/styles/themes.dart';
+import 'package:flutter_puzzle/widgets/circular_icon_tile.dart';
+import 'package:flutter_puzzle/widgets/column_orientation_builder.dart';
 import 'package:flutter_puzzle/widgets/cupertino_color_selector.dart';
 import 'package:flutter_puzzle/widgets/material_color_selector.dart';
 import 'package:flutter_puzzle/widgets/my_grid_painter.dart';
+import 'package:flutter_puzzle/widgets/my_orientation_builder.dart';
+import 'package:flutter_puzzle/widgets/my_reverse_orientation.dart';
 import 'package:flutter_puzzle/widgets/puzzle_card.dart';
 import 'package:flutter_puzzle/widgets/puzzle_draggable_tile.dart';
 import 'package:flutter_puzzle/widgets/rounded_icon_tile.dart';
@@ -72,281 +77,280 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        padding: const EdgeInsets.all(20.00),
-        // decoration: const BoxDecoration(
-        //   color: Color(0xFFd9d9d9),
-        //   // gradient: LinearGradient(
-        //   //   colors: [gradientColor1, gradientColor2],
-        //   //   begin: Alignment.topCenter,
-        //   //   end: Alignment.bottomCenter,
-        //   // ),
-        // ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            //const SizedBox(height: kTextTabBarHeight * 2),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Text("Math Magic", style: ts20ptPacificoMEDIUM.copyWith(fontSize: 25.00, color: theme.textTheme.headline1!.color)),
-            ),
-
-            const SizedBox(height: kTextTabBarHeight),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.00),
-              child: Row(
-                children: [
-                  const RoundedIconTile(icon: Icons.timer_rounded),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Text(
-                      "Time Elapsed",
+      body: MyOrientationBuilder(
+        children: [
+          ColumnOrientationBuilder(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Math Magic",
                       style: ts20ptPacificoMEDIUM.copyWith(
-                        fontSize: 18.00,
-                        color: theme.textTheme.headline2!.color,
+                        fontSize: 25.00,
+                        color: theme.textTheme.headline1!.color,
                       ),
                     ),
-                  ),
-                  Expanded(child: Container()),
-                  Consumer<TimeController>(builder: (context, timerController, child) {
-                    return Text(
-                      timerController.duration.duration,
-                      style: ts20ptPoiretOneBOLD.copyWith(
-                        fontSize: 18.00,
-                        letterSpacing: 5.00,
-                        color: theme.textTheme.subtitle1!.color,
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10.00),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8.00),
-              child: Row(
-                children: [
-                  const RoundedIconTile(icon: Icons.grid_3x3),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Text(
-                      "Moves Tried",
-                      style: ts20ptPacificoMEDIUM.copyWith(
-                        fontSize: 18.00,
-                        color: theme.textTheme.headline2!.color,
-                      ),
-                    ),
-                  ),
-                  Expanded(child: Container()),
-                  Consumer<PuzzleController>(builder: (context, controller, child) {
-                    return Text(
-                      "${controller.moves}",
-                      style: ts20ptPoiretOneBOLD.copyWith(
-                        fontSize: 18.00,
-                        letterSpacing: 5.00,
-                        color: theme.textTheme.subtitle1!.color,
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 10.00),
-
-            Consumer<ScoreCardController>(builder: (context, controller, child) {
-              return Visibility(
-                visible: controller.scoreCard != null,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.00),
-                  child: Row(
-                    children: [
-                      const RoundedIconTile(icon: Icons.wine_bar),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(
-                          "Best Score",
-                          style: ts20ptPacificoMEDIUM.copyWith(
-                            fontSize: 18.00,
-                            color: theme.textTheme.headline2!.color,
-                          ),
-                        ),
-                      ),
-                      Expanded(child: Container()),
-                      Consumer<TimeController>(builder: (context, timerController, child) {
-                        return Text(
-                          "${controller.scoreCard?.duration.toString()} in ${controller.scoreCard?.moves.toString()}",
-                          style: ts20ptPoiretOneBOLD.copyWith(
-                            fontSize: 18.00,
-                            color: theme.textTheme.subtitle1!.color,
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-              );
-            }),
-
-            SafeArea(
-              child: Consumer<PuzzleController>(builder: (context, puzzleController, child) {
-                var puzzleCards = puzzleController.puzzles;
-                var destinationChildIndex = puzzleCards.indexWhere((element) => element.cardValue == puzzleController.endingCardValue);
-                var activeCards = _getActiveChild(puzzleCards, destinationChildIndex);
-                return Container(
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(8.00),
-                  ),
-                  child: CustomPaint(
-                    painter: MyGridPainter(theme.backgroundColor.withOpacity(0.7)),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(8.00),
-                      ),
-                      padding: const EdgeInsets.all(10.00),
-                      height: (MediaQuery.of(context).size.width * 0.25) * 3.5,
-                      width: (MediaQuery.of(context).size.width * 0.25) * 3.5,
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        reverseDuration: const Duration(milliseconds: 200),
-                        transitionBuilder: (child, animation) => ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        ),
-                        child: puzzleController.isGameCompleted
-                            ? InkWell(
-                                onTap: _onNextTap,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: theme.backgroundColor,
-                                  ),
-                                  width: double.infinity,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child: Text("Congratulations!",
-                                            style: ts20ptPacificoREGULAR.copyWith(fontSize: 25.00, color: Colors.white)),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child: Text("You have Completed the Level ${puzzleController.level}",
-                                            style: ts20ptPacificoREGULAR.copyWith(color: Colors.white)),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                        child:
-                                            Text("Next Things In Development", style: ts20ptPacificoREGULAR.copyWith(color: Colors.white)),
-                                      ),
-                                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Consumer<PuzzleController>(
+                          builder: (context, controller, child) {
+                            return Row(
+                              children: [
+                                Visibility(
+                                  visible: controller.level > 1,
+                                  child: CircularIconTile(
+                                    icon: Icons.remove,
+                                    onTap: _onPreviousTap,
                                   ),
                                 ),
-                              )
-                            : Stack(
-                                alignment: Alignment.center,
-                                fit: StackFit.passthrough,
-                                children: List.generate(puzzleCards.length, (index) {
-                                  bool isActiveChild = activeCards.any((element) => element.cardValue == puzzleCards[index].cardValue);
-                                  return PuzzleDraggableTile(
-                                    currentChild: puzzleCards[index],
-                                    isActiveChild: isActiveChild,
-                                    currentChildAlignment: d3Aligns[index],
-                                    destinationChildAlignment: d3Aligns[destinationChildIndex],
-                                    index: index,
-                                    endingCardValue: puzzleController.endingCardValue,
-                                    child: PuzzleCard(
-                                      puzzle: puzzleCards[index],
-                                      endCardValue: puzzleController.endingCardValue,
-                                      color: theme.backgroundColor,
-                                    ),
-                                  );
-                                }),
+                                const SizedBox(width: 10.00),
+                                Text(
+                                  "level ${controller.level}",
+                                  style: ts20ptPacificoMEDIUM.copyWith(
+                                    fontSize: 25.00,
+                                    color: theme.textTheme.headline1!.color,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        ),
+                        const SizedBox(width: 10.00),
+                        CircularIconTile(
+                          icon: Icons.add,
+                          onTap: _onNextTap,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30.00),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.00),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const RoundedIconTile(icon: Icons.timer_rounded),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Text(
+                            "Time Elapsed",
+                            style: ts20ptPacificoMEDIUM.copyWith(
+                              fontSize: 18.00,
+                              color: theme.textTheme.headline2!.color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Consumer<TimeController>(builder: (context, timerController, child) {
+                      return Text(
+                        timerController.duration.duration,
+                        style: ts20ptPoiretOneBOLD.copyWith(
+                          fontSize: 18.00,
+                          letterSpacing: 5.00,
+                          color: theme.textTheme.subtitle1!.color,
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20.00),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.00),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const RoundedIconTile(icon: Icons.grid_3x3),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Text(
+                            "Moves Tried",
+                            style: ts20ptPacificoMEDIUM.copyWith(
+                              fontSize: 18.00,
+                              color: theme.textTheme.headline2!.color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Consumer<PuzzleController>(builder: (context, controller, child) {
+                      return Text(
+                        "${controller.moves}",
+                        style: ts20ptPoiretOneBOLD.copyWith(
+                          fontSize: 18.00,
+                          letterSpacing: 5.00,
+                          color: theme.textTheme.subtitle1!.color,
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20.00),
+              Consumer<ScoreCardController>(builder: (context, controller, child) {
+                return Visibility(
+                  visible: controller.scoreCard != null,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.00),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const RoundedIconTile(icon: Icons.wine_bar),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Text(
+                                "Best Score",
+                                style: ts20ptPacificoMEDIUM.copyWith(
+                                  fontSize: 18.00,
+                                  color: theme.textTheme.headline2!.color,
+                                ),
                               ),
-                      ),
+                            ),
+                          ],
+                        ),
+                        Consumer<TimeController>(builder: (context, timerController, child) {
+                          return Text(
+                            "${controller.scoreCard?.duration.toString()} in ${controller.scoreCard?.moves.toString()}",
+                            style: ts20ptPoiretOneBOLD.copyWith(
+                              fontSize: 18.00,
+                              color: theme.textTheme.subtitle1!.color,
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
                 );
               }),
-            ),
-            const SizedBox(height: 15.00),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.00),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RoundedIconTile(
-                    icon: Icons.shuffle,
-                    onTap: _onResetTap,
+            ],
+          ),
+          SafeArea(
+            child: Consumer<PuzzleController>(builder: (context, puzzleController, child) {
+              var puzzleCards = puzzleController.puzzles;
+              var destinationChildIndex = puzzleCards.indexWhere((element) => element.cardValue == puzzleController.endingCardValue);
+              var activeCards = ActiveChildAlgo.activeCardsFor9(puzzleCards, destinationChildIndex);
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(8.00),
+                ),
+                child: CustomPaint(
+                  painter: MyGridPainter(theme.backgroundColor.withOpacity(0.7)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(8.00),
+                    ),
+                    padding: const EdgeInsets.all(10.00),
+                    height: (min(size.height, size.width) * 0.25) * 3.5,
+                    width: (min(size.height, size.width) * 0.25) * 3.5,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      reverseDuration: const Duration(milliseconds: 200),
+                      transitionBuilder: (child, animation) => ScaleTransition(
+                        scale: animation,
+                        child: child,
+                      ),
+                      child: puzzleController.isGameCompleted
+                          ? InkWell(
+                              onTap: _onNextTap,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: theme.backgroundColor,
+                                ),
+                                width: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                      child: Text("Congratulations!",
+                                          style: ts20ptPacificoREGULAR.copyWith(fontSize: 25.00, color: Colors.white)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                      child: Text("You have Completed the Level ${puzzleController.level}",
+                                          style: ts20ptPacificoREGULAR.copyWith(color: Colors.white)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                      child: Text("Next Things In Development", style: ts20ptPacificoREGULAR.copyWith(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Stack(
+                              alignment: Alignment.center,
+                              fit: StackFit.passthrough,
+                              children: List.generate(puzzleCards.length, (index) {
+                                bool isActiveChild = activeCards.any((element) => element.cardValue == puzzleCards[index].cardValue);
+                                return PuzzleDraggableTile(
+                                  currentChild: puzzleCards[index],
+                                  isActiveChild: isActiveChild,
+                                  currentChildAlignment: d3Aligns[index],
+                                  destinationChildAlignment: d3Aligns[destinationChildIndex],
+                                  index: index,
+                                  endingCardValue: puzzleController.endingCardValue,
+                                  child: PuzzleCard(
+                                    puzzle: puzzleCards[index],
+                                    endCardValue: puzzleController.endingCardValue,
+                                    color: theme.backgroundColor,
+                                  ),
+                                );
+                              }),
+                            ),
+                    ),
                   ),
-                  RoundedIconTile(
-                    icon: Icons.lightbulb_outline,
-                    onTap: _onHintTap,
-                  ),
-                  RoundedIconTile(
-                    icon: Icons.check,
-                    onPanDown: _onCheckDown,
-                    onPanEnd: _onCheckEnd,
-                  ),
-                  Consumer<ThemeController>(builder: (context, themeC, child) {
-                    return RoundedIconTile(
-                      icon: Icons.color_lens,
-                      onTap: () => _onThemeChange(themeC.isDarkEnabled),
-                    );
-                  }),
-                ],
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 15.00),
+          MyReverseOrientation(
+            children: [
+              RoundedIconTile(
+                icon: Icons.shuffle,
+                onTap: _onResetTap,
               ),
-            )
-          ],
-        ),
+              RoundedIconTile(
+                icon: Icons.lightbulb_outline,
+                onTap: _onHintTap,
+              ),
+              RoundedIconTile(
+                icon: Icons.check,
+                onPanDown: _onCheckDown,
+                onPanEnd: _onCheckEnd,
+              ),
+              Consumer<ThemeController>(builder: (context, themeC, child) {
+                return RoundedIconTile(
+                  icon: Icons.color_lens,
+                  onTap: () => _onThemeChange(),
+                );
+              }),
+            ],
+          )
+        ],
       ),
     );
-  }
-
-  List<Puzzle> _getActiveChild(List<Puzzle> puzzleCards, int holderIndex) {
-    List<Puzzle> activeCards = [];
-
-    bool isInLeft = holderIndex == 0 || holderIndex == 3 || holderIndex == 6 || holderIndex == 9;
-    bool isInMiddle = holderIndex == 1 || holderIndex == 4 || holderIndex == 7 || holderIndex == 10;
-    bool isInRight = holderIndex == 2 || holderIndex == 5 || holderIndex == 8 || holderIndex == 11;
-
-    //To detect left enable card we will minus 1 from the index of the holder card
-    //and got the possible index of the left card
-    int leftCardIndex = holderIndex - 1;
-    //Now we will check weather this index is exist in the list or not
-    if (!leftCardIndex.isNegative && puzzleCards.length > leftCardIndex && !isInLeft) {
-      activeCards.add(puzzleCards[leftCardIndex]);
-    }
-
-    //Now we will find another 3 cards right(+1), top(-3), bottom(+3) adding and subtracting their respective
-    //values if they exist in the list
-    int rightCardIndex = holderIndex + 1;
-    //Adding right possible card
-    if (!rightCardIndex.isNegative && puzzleCards.length > rightCardIndex && !isInRight) {
-      activeCards.add(puzzleCards[rightCardIndex]);
-    }
-
-    int topCardIndex = holderIndex - 3;
-    //Adding top possible card
-    if (!topCardIndex.isNegative && puzzleCards.length > topCardIndex) {
-      activeCards.add(puzzleCards[topCardIndex]);
-    }
-
-    int bottomCardIndex = holderIndex + 3;
-    //Adding top possible card
-    if (!bottomCardIndex.isNegative && puzzleCards.length > bottomCardIndex) {
-      activeCards.add(puzzleCards[bottomCardIndex]);
-    }
-
-    return activeCards;
   }
 
   void _onResetTap() {
@@ -357,7 +361,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
     Provider.of<PuzzleController>(context, listen: false).increaseLevel();
   }
 
-  void _onThemeChange(bool isDarkEnabled) async {
+  void _onThemeChange() async {
     final result = await showDialog(
       context: context,
       builder: (context) {
@@ -386,5 +390,9 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
 
   void _onCheckEnd(DragEndDetails details) {
     Provider.of<OrderController>(context, listen: false).showOrder(false);
+  }
+
+  void _onPreviousTap() {
+    Provider.of<PuzzleController>(context, listen: false).decreaseLevel();
   }
 }

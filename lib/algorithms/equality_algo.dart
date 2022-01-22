@@ -12,4 +12,13 @@ class EqualityAlgo {
     }
     return true;
   }
+
+  static bool isIntEqual(List<int> parentList, List<int> childList) {
+    for (int i = 0; i < parentList.length; i++) {
+      if (parentList[i] != childList[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

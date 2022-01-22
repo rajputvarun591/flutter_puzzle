@@ -59,15 +59,17 @@ class _PuzzleDraggableTileState extends State<PuzzleDraggableTile> with SingleTi
   void didChangeDependencies() {
     super.didChangeDependencies();
     Provider.of<HintController>(context, listen: true).addListener(() {
-      var pro = context.read<HintController>();
-      Puzzle puzzle = pro.puzzle!;
-      if(puzzle.cardValue == widget.currentChild.cardValue) {
-        _controller.reset();
-        _animation = _controller.drive(AlignmentTween(begin: widget.currentChildAlignment, end: widget.destinationChildAlignment));
-        _controller.forward().then((value) {
-          _dragAlignment = widget.currentChildAlignment;
-          Provider.of<PuzzleController>(context, listen: false).swapChildren(widget.currentChild);
-        });
+      if (mounted) {
+        var pro = context.read<HintController>();
+        Puzzle puzzle = pro.puzzle!;
+        if(puzzle.cardValue == widget.currentChild.cardValue) {
+          _controller.reset();
+          _animation = _controller.drive(AlignmentTween(begin: widget.currentChildAlignment, end: widget.destinationChildAlignment));
+          _controller.forward().then((value) {
+            _dragAlignment = widget.currentChildAlignment;
+            Provider.of<PuzzleController>(context, listen: false).swapChildren(widget.currentChild);
+          });
+        }
       }
     });
 

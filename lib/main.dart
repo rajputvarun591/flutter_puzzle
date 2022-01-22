@@ -19,6 +19,7 @@ void main() async {
   await HiveDatabase.initDatabase();
   await Hive.openBox(HiveDatabase.scoreCardBox);
   await Hive.openBox(HiveDatabase.parentPuzzleBox);
+  await Hive.openBox(HiveDatabase.boardBox);
 
   runApp(
     MultiProvider(
@@ -27,14 +28,14 @@ void main() async {
         ChangeNotifierProvider<HintController>(create: (context) => HintController()),
         ChangeNotifierProvider<ScoreCardController>(create: (context) => ScoreCardController()),
         ChangeNotifierProvider<AnimationStatusController>(create: (context) => AnimationStatusController()),
-        ChangeNotifierProvider<ThemeController>(create: (context) => ThemeController()),
+        ChangeNotifierProvider<ThemeController>(create: (context) => ThemeController()..initTheme()),
         ChangeNotifierProvider<DragController>(create: (context) => DragController()),
         ChangeNotifierProvider<TimeController>(create: (context) => TimeController()),
         ChangeNotifierProvider<PuzzleController>(
           create: (context) => PuzzleController(
             Provider.of<TimeController>(context, listen: false),
             Provider.of<ScoreCardController>(context, listen: false),
-          )..initCards(),
+          )..initInitialCard(),
         ),
 
       ],

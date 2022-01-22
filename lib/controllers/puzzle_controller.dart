@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_puzzle/algorithms/equality_algo.dart';
+import 'package:flutter_puzzle/constants/constants.dart';
 import 'package:flutter_puzzle/controllers/score_card_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
 import 'package:flutter_puzzle/database/hive_database.dart';
@@ -25,6 +27,25 @@ class PuzzleController extends ChangeNotifier {
   int level = 1;
   int gridNumber = 3;
   bool isGameCompleted = false;
+
+  void initInitialCard() {
+    HiveDatabase().clearParentPuzzle();
+    final lastLevel = HiveDatabase().getBoardValue(Board.currentLevel);
+    if(lastLevel != null) {
+      level = lastLevel;
+    }
+    List<int> values = getValues(level, gridNumber * gridNumber);
+    values.shuffle(random);
+
+    for (int i = 0; i < (gridNumber * gridNumber); i++) {
+      puzzles.add(Puzzle(values[i]));
+    }
+    notifyListeners();
+    timeController.initValues();
+    scoreController.getInitialScore(level);
+  }
+
+
 
   void initCards({int? grid}) {
     puzzles.clear();
@@ -61,9 +82,8 @@ class PuzzleController extends ChangeNotifier {
     checkForEnd();
   }
 
-  List<int> getValues(int? level, int total) {
+  List<int> getValues(int level, int total) {
     List<int> numbers = [];
-    level ??= 1;
 
     int ending = total * level;
     endingCardValue = ending;
@@ -85,16 +105,9 @@ class PuzzleController extends ChangeNotifier {
     List<int> sortedList = puzzles.map((e) => e.cardValue).toList();
     sortedList.sort();
 
-    List<bool> isEqual = [];
-    for (int i = 0; i < sortedList.length; i++) {
-      if (sortedList[i] == currentList[i]) {
-        isEqual.add(true);
-      } else {
-        isEqual.add(false);
-      }
-    }
+    bool isEqual = EqualityAlgo.isIntEqual(currentList, sortedList);
 
-    if (isEqual.any((e) => e == false)) {
+    if (!isEqual) {
       developer.log("Match Not Found!");
     } else {
       ScoreCard scoreCard = ScoreCard(level, moves, timeController.duration.duration, DateTime.now().toIso8601String());
@@ -108,6 +121,14 @@ class PuzzleController extends ChangeNotifier {
 
   void increaseLevel() {
     level++;
+    getScore();
+    puzzles.clear();
+    initCards();
+    HiveDatabase().saveBoardValue(Board.currentLevel, level);
+  }
+
+  void decreaseLevel() {
+    level--;
     getScore();
     puzzles.clear();
     initCards();

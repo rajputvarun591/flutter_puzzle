@@ -11,6 +11,7 @@ class HiveDatabase {
   
   static const scoreCardBox = "score_card_box";
   static const parentPuzzleBox = "parent_puzzle_box";
+  static const boardBox = "board_box";
 
   static Future<void> initDatabase() async {
     var dir = await path.getApplicationDocumentsDirectory();
@@ -30,20 +31,17 @@ class HiveDatabase {
   }
 
   void saveParentPuzzle(List<Puzzle> card) async {
-    print("Saving Puzzle " + card.toString());
     final box = Hive.box(parentPuzzleBox);
     box.clear().then((value) {
       for (var item in card) {
         box.add(item);
       }
     });
-    print("Puzzle In Box0" + box.toMap().toString());
   }
 
   List<Puzzle> getParentPuzzle() {
     List<Puzzle> card = [];
     final box = Hive.box(parentPuzzleBox);
-    print("Puzzle In Box" + box.toMap().toString());
     for(int i = 0; i < box.length; i++) {
       card.add(box.getAt(i));
     }
@@ -64,4 +62,14 @@ class HiveDatabase {
   //     box.put(level, scoreCard);
   //   }
   // }
+
+  void saveBoardValue(String key, dynamic value) async {
+    final box = Hive.box(boardBox);
+    return box.put(key, value);
+  }
+
+  dynamic getBoardValue(String key) {
+    final box = Hive.box(boardBox);
+    return box.get(key);
+  }
 }
