@@ -83,53 +83,53 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
         children: [
           ColumnOrientationBuilder(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Math Magic",
-                      style: ts20ptPacificoMEDIUM.copyWith(
-                        fontSize: 25.00,
-                        color: theme.textTheme.headline1!.color,
+              Wrap(
+                runSpacing: 10.00,
+                spacing: 10.00,
+                children: [
+                  Text(
+                    "Math Magic",
+                    style: ts20ptPacificoMEDIUM.copyWith(
+                      fontSize: 25.00,
+                      color: theme.textTheme.headline1!.color,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Consumer<PuzzleController>(builder: (context, controller, child) {
+                        return Row(
+                          children: [
+                            AnimatedScale(
+                              scale: controller.level > 1 ? 1.00 : 00,
+                              duration: const Duration(milliseconds: 100),
+                              alignment: Alignment.center,
+                              child: CircularIconTile(
+                                icon: Icons.remove,
+                                onTap: _onPreviousTap,
+                              ),
+                            ),
+                            const SizedBox(width: 10.00),
+                            Text(
+                              "level ${controller.level}",
+                              style: ts20ptPacificoMEDIUM.copyWith(
+                                fontSize: 20.00,
+                                color: theme.textTheme.headline1!.color,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        );
+                      }),
+                      const SizedBox(width: 10.00),
+                      CircularIconTile(
+                        icon: Icons.add,
+                        onTap: _onNextTap,
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Consumer<PuzzleController>(
-                          builder: (context, controller, child) {
-                            return Row(
-                              children: [
-                                Visibility(
-                                  visible: controller.level > 1,
-                                  child: CircularIconTile(
-                                    icon: Icons.remove,
-                                    onTap: _onPreviousTap,
-                                  ),
-                                ),
-                                const SizedBox(width: 10.00),
-                                Text(
-                                  "level ${controller.level}",
-                                  style: ts20ptPacificoMEDIUM.copyWith(
-                                    fontSize: 25.00,
-                                    color: theme.textTheme.headline1!.color,
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                        ),
-                        const SizedBox(width: 10.00),
-                        CircularIconTile(
-                          icon: Icons.add,
-                          onTap: _onNextTap,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 30.00),
               Container(
@@ -203,8 +203,9 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
               ),
               const SizedBox(height: 20.00),
               Consumer<ScoreCardController>(builder: (context, controller, child) {
-                return Visibility(
-                  visible: controller.scoreCard != null,
+                return AnimatedScale(
+                  scale: controller.scoreCard != null ? 1.00 : 00,
+                  duration: const Duration(milliseconds: 100),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8.00),
                     child: Row(
@@ -242,7 +243,11 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
               }),
             ],
           ),
-          SafeArea(
+          SizedBox(
+            // width: max(size.width, size.height) * 0.40,
+            // height: max(size.width, size.height) * 0.40,
+            width: (size.height + size.width) * 0.27,
+            height: (size.height + size.width) * 0.27,
             child: Consumer<PuzzleController>(builder: (context, puzzleController, child) {
               var puzzleCards = puzzleController.puzzles;
               var destinationChildIndex = puzzleCards.indexWhere((element) => element.cardValue == puzzleController.endingCardValue);
@@ -325,28 +330,30 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
             }),
           ),
           const SizedBox(height: 15.00),
-          MyReverseOrientation(
-            children: [
-              RoundedIconTile(
-                icon: Icons.shuffle,
-                onTap: _onResetTap,
-              ),
-              RoundedIconTile(
-                icon: Icons.lightbulb_outline,
-                onTap: _onHintTap,
-              ),
-              RoundedIconTile(
-                icon: Icons.check,
-                onPanDown: _onCheckDown,
-                onPanEnd: _onCheckEnd,
-              ),
-              Consumer<ThemeController>(builder: (context, themeC, child) {
-                return RoundedIconTile(
-                  icon: Icons.color_lens,
-                  onTap: () => _onThemeChange(),
-                );
-              }),
-            ],
+          SafeArea(
+            child: MyReverseOrientation(
+              children: [
+                RoundedIconTile(
+                  icon: Icons.shuffle,
+                  onTap: _onResetTap,
+                ),
+                RoundedIconTile(
+                  icon: Icons.lightbulb_outline,
+                  onTap: _onHintTap,
+                ),
+                RoundedIconTile(
+                  icon: Icons.check,
+                  onPanDown: _onCheckDown,
+                  onPanEnd: _onCheckEnd,
+                ),
+                Consumer<ThemeController>(builder: (context, themeC, child) {
+                  return RoundedIconTile(
+                    icon: Icons.color_lens,
+                    onTap: () => _onThemeChange(),
+                  );
+                }),
+              ],
+            ),
           )
         ],
       ),

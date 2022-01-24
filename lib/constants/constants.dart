@@ -109,4 +109,5 @@ const List<List<int>> pathTables = [
 class Board {
   static const String currentLevel = "current_level";
   static const String currentTheme = "current_theme";
+  static const String goalNode = "goal_node";
 }

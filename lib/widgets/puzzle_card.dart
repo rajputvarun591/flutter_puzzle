@@ -17,8 +17,10 @@ class PuzzleCard extends StatelessWidget {
     final bool isHolder = puzzle.cardValue == endCardValue;
     final int length = puzzle.cardValue.toString().characters.length;
     return Container(
-      width: min(size.height, size.width) * 0.25,
-      height: min(size.height, size.width) * 0.25,
+      // width: min(size.height, size.width) * 0.25,
+      // height: min(size.height, size.width) * 0.25,
+      width: (size.height + size.width) * 0.0775,
+      height: (size.height + size.width) * 0.0775,
       alignment: length <= 3 ? Alignment.center : Alignment.topLeft,
       decoration: BoxDecoration(
         color: isHolder ? Colors.transparent : color,

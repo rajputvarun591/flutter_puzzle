@@ -20,9 +20,9 @@ class ColumnOrientationBuilder extends StatelessWidget {
           );
         } else {
           return SizedBox(
-            width: size.width * 0.35,
+            width: size.width * 0.40,
             child: Padding(
-              padding: const EdgeInsets.only(left: 30.00),
+              padding: const EdgeInsets.only(left: 30.00, right: 10.00),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'material_color_selector.dart';
 
@@ -16,9 +17,12 @@ class MyOrientationBuilder extends StatelessWidget {
             children: children,
           );
         } else {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: children,
+          return Padding(
+            padding: const EdgeInsets.only(top: kTextTabBarHeight / 2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: children,
+            ),
           );
         }
       },

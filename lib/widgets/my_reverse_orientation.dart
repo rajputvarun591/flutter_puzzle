@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 
 import 'material_color_selector.dart';
@@ -8,6 +10,7 @@ class MyReverseOrientation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return OrientationBuilder(
       builder: (context, orientation) {
         if(Orientation.portrait == orientation) {
@@ -20,7 +23,7 @@ class MyReverseOrientation extends StatelessWidget {
           );
         } else {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30.00).copyWith(right: 50.00),
+            padding: const EdgeInsets.symmetric(vertical: 30.00).copyWith(right: 30.00),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: children,

@@ -36,6 +36,7 @@ class ActiveChildAlgo {
       activeCards.add(cards[bottomCardIndex]);
     }
 
+    activeCards.sort((puzzle1, puzzle2) => puzzle1.cardValue.compareTo(puzzle2.cardValue));
     return activeCards;
   }
 }

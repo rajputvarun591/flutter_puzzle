@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter_puzzle/models/puzzle.dart';
 import 'package:flutter_puzzle/models/score_card.dart';
 import 'package:hive/hive.dart';
@@ -14,10 +17,14 @@ class HiveDatabase {
   static const boardBox = "board_box";
 
   static Future<void> initDatabase() async {
-    var dir = await path.getApplicationDocumentsDirectory();
-    Hive.init(dir.path);
-    Hive.registerAdapter(ScoreCardAdapter());
-    Hive.registerAdapter(PuzzleAdapter());
+    try {
+      var dir = await path.getApplicationDocumentsDirectory();
+      Hive.init(dir.path);
+      Hive.registerAdapter(ScoreCardAdapter());
+      Hive.registerAdapter(PuzzleAdapter());
+    } catch (e, stackTrace) {
+      log("Error", error: e, stackTrace: stackTrace);
+    }
   }
 
   Future<void> saveScore(ScoreCard scoreCard) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_puzzle/controllers/animation_status_controller.dart';
 import 'package:flutter_puzzle/controllers/drag_controller.dart';
 import 'package:flutter_puzzle/controllers/hint_controller.dart';
@@ -20,6 +21,8 @@ void main() async {
   await Hive.openBox(HiveDatabase.scoreCardBox);
   await Hive.openBox(HiveDatabase.parentPuzzleBox);
   await Hive.openBox(HiveDatabase.boardBox);
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(
     MultiProvider(

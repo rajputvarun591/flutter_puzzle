@@ -30,6 +30,7 @@ class PuzzleController extends ChangeNotifier {
 
   void initInitialCard() {
     HiveDatabase().clearParentPuzzle();
+    HiveDatabase().saveBoardValue(Board.goalNode, null);
     final lastLevel = HiveDatabase().getBoardValue(Board.currentLevel);
     if(lastLevel != null) {
       level = lastLevel;
@@ -68,6 +69,7 @@ class PuzzleController extends ChangeNotifier {
     timeController.initValues();
     scoreController.getInitialScore(level);
     HiveDatabase().clearParentPuzzle();
+    HiveDatabase().saveBoardValue(Board.goalNode, null);
   }
 
   void swapChildren(Puzzle puzzle) {
