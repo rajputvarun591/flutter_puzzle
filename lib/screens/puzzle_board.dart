@@ -10,6 +10,7 @@ import 'package:flutter_puzzle/controllers/hint_controller.dart';
 import 'package:flutter_puzzle/controllers/order_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/score_card_controller.dart';
+import 'package:flutter_puzzle/controllers/shuffle_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
 import 'package:flutter_puzzle/database/hive_database.dart';
@@ -361,6 +362,7 @@ class _PuzzleBoardState extends State<PuzzleBoard> {
   }
 
   void _onResetTap() {
+    Provider.of<ShuffleController>(context, listen: false).doAnimate();
     Provider.of<PuzzleController>(context, listen: false).initCards();
   }
 

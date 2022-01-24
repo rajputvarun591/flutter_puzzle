@@ -5,6 +5,7 @@ import 'package:flutter_puzzle/controllers/drag_controller.dart';
 import 'package:flutter_puzzle/controllers/hint_controller.dart';
 import 'package:flutter_puzzle/controllers/order_controller.dart';
 import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
+import 'package:flutter_puzzle/controllers/shuffle_controller.dart';
 import 'package:flutter_puzzle/controllers/theme_controller.dart';
 import 'package:flutter_puzzle/controllers/time_controller.dart';
 import 'package:flutter_puzzle/database/hive_database.dart';
@@ -27,6 +28,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<ShuffleController>(create: (context) => ShuffleController()),
         ChangeNotifierProvider<OrderController>(create: (context) => OrderController()),
         ChangeNotifierProvider<HintController>(create: (context) => HintController()),
         ChangeNotifierProvider<ScoreCardController>(create: (context) => ScoreCardController()),
