@@ -10,16 +10,16 @@ class RoundedIconTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(6.00)
-      ),
-      padding: const EdgeInsets.all(8.00),
-      child: GestureDetector(
-        onTap: onTap,
-        onPanDown: onPanDown,
-        onPanEnd: onPanEnd,
+    return GestureDetector(
+      onTap: onTap,
+      onPanDown: onPanDown,
+      onPanEnd: onPanEnd,
+      child: Container(
+        decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(6.00)
+        ),
+        padding: const EdgeInsets.all(8.00),
         child: Container(
           decoration: BoxDecoration(
             color: theme.backgroundColor,

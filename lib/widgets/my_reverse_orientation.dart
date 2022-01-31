@@ -15,7 +15,7 @@ class MyReverseOrientation extends StatelessWidget {
       builder: (context, orientation) {
         if(Orientation.portrait == orientation) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.00),
+            padding: const EdgeInsets.symmetric(horizontal: 20.00).copyWith(bottom: 10.00),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: children,

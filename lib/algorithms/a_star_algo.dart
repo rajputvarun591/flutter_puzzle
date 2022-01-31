@@ -31,9 +31,6 @@ class AStarAlgo {
     ///First we need to find current goal index
     final goalIndex = HiveDatabase().getBoardValue(Board.goalNode);
 
-    print("Goal Index" + goalIndex.toString());
-
-
 
     for (int i = goalIndex ?? 0; i < cards.length; i++) {
       var currentCard = cards[i];
@@ -64,7 +61,6 @@ class AStarAlgo {
   }
 
   static Puzzle? setGoal(List<Puzzle> activeCards, List<Puzzle> cards, int goalValue, int holderCardIndex, int endingCardValue, int i) {
-    print("Single Call");
     ///STEP 4
     ///In this step we will construct all possible iterations by swapping active cards with the holder card
     ///and find out their possible path values for each

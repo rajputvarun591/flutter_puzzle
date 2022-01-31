@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_puzzle/controllers/puzzle_controller.dart';
 import 'package:flutter_puzzle/controllers/shuffle_controller.dart';
+import 'package:flutter_puzzle/enums/shuffle_action.dart';
 import 'package:flutter_puzzle/models/puzzle.dart';
 import 'package:flutter_puzzle/styles/text_style.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +34,7 @@ class _PuzzleCardState extends State<PuzzleCard> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
     animationController.addListener(_listener);
   }
 
@@ -45,6 +47,16 @@ class _PuzzleCardState extends State<PuzzleCard> with SingleTickerProviderStateM
         forTextOpacity = animationController.drive(Tween(begin: 1, end: 0));
         forScale = animationController.drive(Tween(begin: 1, end: random.nextDouble()));
         animationController.forward().then((value) {
+          var pro = Provider.of<ShuffleController>(context, listen: false);
+          if (pro.shuffleAction == ShuffleAction.noChange && widget.puzzle.cardValue == widget.endCardValue && !pro.isSomeOneAnimating) {
+            Provider.of<PuzzleController>(context, listen: false).initCards();
+          }
+          if (pro.shuffleAction == ShuffleAction.increase && widget.puzzle.cardValue == widget.endCardValue && !pro.isSomeOneAnimating) {
+            Provider.of<PuzzleController>(context, listen: false).increaseLevel();
+          }
+          if (pro.shuffleAction == ShuffleAction.decrease && widget.puzzle.cardValue == widget.endCardValue && !pro.isSomeOneAnimating) {
+            Provider.of<PuzzleController>(context, listen: false).decreaseLevel();
+          }
           animationController.reverse();
         });
       }
@@ -66,7 +78,7 @@ class _PuzzleCardState extends State<PuzzleCard> with SingleTickerProviderStateM
     return Opacity(
       opacity: opacity,
       child: AnimatedScale(
-        duration: const Duration(milliseconds: 50),
+        duration: const Duration(milliseconds: 200),
         scale: scale,
         child: Container(
           // width: min(size.height, size.width) * 0.25,
